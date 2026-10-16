@@ -1,0 +1,16 @@
+{
+  "name": "renaissance-visita-virtual",
+  "private": true,
+  "description": "Visita virtual 3D do Renaissance Residence",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "serve": "node scripts/serve.mjs"
+  },
+  "dependencies": {
+    "three": "0.180.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  }
+}
