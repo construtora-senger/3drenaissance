@@ -156,6 +156,16 @@ export class WalkControls {
     this.update(0);
   }
 
+  // Jumps to a viewpoint: gl position [x, y, z] (y is ignored: eye height follows the floor) and yaw.
+  goTo(position, yaw) {
+    this.clearInput();
+    this.camera.position.x = position[0];
+    this.camera.position.z = position[2];
+    this.yaw = yaw;
+    this.pitch = 0.02;
+    this.dirty = true;
+  }
+
   exit() {
     this.active = false;
     this.clearInput();

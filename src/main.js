@@ -25,7 +25,7 @@ import {
   uploadTextures,
 } from "./assets.js";
 import { createExteriorLighting, prepareExteriorModel } from "./exterior.js";
-import { createHallScene } from "./hall.js";
+import { createHallScene, setDoorsOpen } from "./hall.js";
 import { WalkControls } from "./walk-controls.js";
 
 const $ = id => document.getElementById(id);
@@ -47,6 +47,7 @@ let interactive = false; // false while loading: the render loop idles
 let fatal = false;
 let needsRender = true;
 let tween = null; // camera animation between preset views
+let doorOpen = 0; // entrance doors, 0 closed … 1 open
 let stageLabel = "Iniciando";
 let pixelRatio = 1;
 let focusCenter, focusSize, viewDistance;
@@ -220,7 +221,13 @@ function frame(time) {
     if (t >= 1) tween = null;
   }
 
-  const moved = mode === "hall" ? walk.update(dt) : orbit.update(dt);
+  let moved;
+  if (mode === "hall") {
+    const walked = walk.update(dt);
+    moved = updateDoors(dt) || walked;
+  } else {
+    moved = orbit.update(dt);
+  }
   if (!(moved || animating || needsRender || (mode === "exterior" && orbit.autoRotate))) {
     fpsLast = 0;
     return;
@@ -256,6 +263,26 @@ function frame(time) {
     }
   }
   fpsLast = time;
+}
+
+// The entrance doors swing open as the visitor approaches them.
+function updateDoors(dt) {
+  const doors = hallScene?.userData.doors;
+  if (!doors?.length) return false;
+  const [cx, cz] = config.hall.door.center;
+  const target = Math.hypot(camera.position.x - cx, camera.position.z - cz) < config.hall.door.openDistance ? 1 : 0;
+  if (doorOpen === target) return false;
+  doorOpen += (target - doorOpen) * Math.min(1, dt * 3.5);
+  if (Math.abs(target - doorOpen) < 0.002) doorOpen = target;
+  setDoorsOpen(doors, doorOpen);
+  return true;
+}
+
+function goToViewpoint(name) {
+  const view = config.hall.viewpoints[name];
+  if (!view || mode !== "hall" || !interactive) return;
+  walk.goTo(view.position, view.yaw);
+  needsRender = true;
 }
 
 function resetFps() {
@@ -399,7 +426,7 @@ async function enterHall() {
       setStage("Preparando os acabamentos.", 88);
       const gltf = await parseModel(buffer, textures);
       hallNav = config.hall.nav;
-      return createHallScene(renderer, gltf.scene, { mobile });
+      return createHallScene(renderer, gltf.scene, { mobile, hall: config.hall, version: config.version });
     })();
     hallScene = await hallPromise;
 
@@ -412,7 +439,9 @@ async function enterHall() {
     camera.far = 180;
     camera.updateProjectionMatrix();
     walk.enter(hallNav);
-    renderer.toneMappingExposure = 1.02;
+    renderer.toneMappingExposure = config.hall.exposure ?? 1.0;
+    doorOpen = 0;
+    setDoorsOpen(hallScene.userData.doors, 0);
     document.body.classList.add("walking");
     $("hint").textContent = HALL_HINT;
     setStage("Iluminando o hall.", 96);
@@ -531,10 +560,8 @@ $("hallReference").onclick = () => openReferences("hall");
 
 $("enterHall").onclick = enterHall;
 $("leaveHall").onclick = leaveHall;
-$("resetHall").onclick = () => {
-  walk.reset();
-  needsRender = true;
-};
+$("goEntrance").onclick = () => goToViewpoint("entrada");
+$("goElevators").onclick = () => goToViewpoint("elevadores");
 $("crouch").onclick = () => walk.toggleCrouch();
 $("zoomIn").onclick = () => zoomBy(0.82);
 $("zoomOut").onclick = () => zoomBy(1.22);
@@ -626,3 +653,15 @@ $("quality").onchange = event => {
     showFatalError(error);
   }
 })();
+
+// Test hook (only with ?debug): place the walker at an exact spot, e.g. renaissanceDebug.walkTo(37.9, 66, 0).
+if (new URLSearchParams(location.search).has("debug")) {
+  window.renaissanceDebug = {
+    goToViewpoint,
+    walkTo(x, z, yaw = 0) {
+      walk.goTo([x, 0, z], yaw);
+      needsRender = true;
+    },
+    state: () => ({ position: camera.position.toArray().map(v => +v.toFixed(3)), doorOpen: +doorOpen.toFixed(3), mode }),
+  };
+}

@@ -473,8 +473,14 @@ body.clean .views:hover {
   border-radius: 30px;
   max-width: calc(100% - 24px);
   box-shadow: 0 6px 28px #33281519;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.walk-tools::-webkit-scrollbar {
+  display: none;
 }
 .walk-tools button {
+  flex-shrink: 0;
   border: 0;
   background: transparent;
   color: #6e5a40;

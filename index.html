@@ -15,8 +15,8 @@
 <meta property="og:image:height" content="900">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="styles.css?v=543d485ff2">
-<script src="app.js?v=50380737c7" defer></script>
+<link rel="stylesheet" href="styles.css?v=0c215b8d6e">
+<script src="app.js?v=73eaff0c81" defer></script>
 </head>
 <body>
 <!-- Logo, drawn once and reused in the header and on the loading screen. -->
@@ -66,7 +66,8 @@
 
 <nav class="walk-tools" aria-label="Controles do hall">
   <button id="leaveHall">Voltar ao prédio</button>
-  <button id="resetHall">Reiniciar</button>
+  <button id="goEntrance">Entrada</button>
+  <button id="goElevators">Elevadores</button>
   <button id="crouch" aria-pressed="false">Agachar</button>
   <button id="hallReference">Ver render</button>
 </nav>
@@ -86,7 +87,7 @@
     <dt>O edifício</dt>
     <dd>Arraste para girar. Role para aproximar. No celular, use dois dedos para aproximar e deslocar.</dd>
     <dt>Dentro do hall</dt>
-    <dd>No computador: W, A, S, D ou setas para caminhar; arraste para olhar. C para agachar. No celular: controle à esquerda para caminhar e arraste a cena para olhar.</dd>
+    <dd>A visita começa na calçada, em frente à porta, que se abre quando você se aproxima. No computador: W, A, S, D ou setas para caminhar; arraste para olhar; C para agachar. No celular: controle à esquerda para caminhar e arraste a cena para olhar. Use “Entrada” e “Elevadores” para ir direto a esses pontos.</dd>
   </dl>
   <button class="text-button" id="showReferences">Comparar com os renders</button>
   <div class="settings">
@@ -98,7 +99,7 @@
     </select>
     <p>Fluidez durante o movimento: <strong id="fpsValue">—</strong></p>
   </div>
-  <small>Primeiro teste de caminhada dentro do hall, baseado no SketchUp original. Materiais e decoração em ajuste conforme os renders. A conferência arquitetônica do térreo está pendente; os demais ambientes serão liberados nas próximas etapas.</small>
+  <small>Hall de entrada com as medidas das pranchas do térreo, do 2º pavimento e dos cortes (pé-direito duplo de 5,78 m, mezanino a 3,24 m). Acabamentos e decoração seguem o render de referência; a iluminação de entardecer foi calculada em alta qualidade. Os demais ambientes serão liberados nas próximas etapas.</small>
 </aside>
 
 <dialog id="references" aria-labelledby="referenceTitle">

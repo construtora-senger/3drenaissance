@@ -5,12 +5,18 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "serve": "node scripts/serve.mjs"
+    "serve": "node scripts/serve.mjs",
+    "hall:textures": "python3 tools/hall/make_textures.py",
+    "hall:package": "node tools/hall/package.mjs"
   },
   "dependencies": {
     "three": "0.180.0"
   },
   "devDependencies": {
-    "esbuild": "0.28.2"
+    "esbuild": "0.28.2",
+    "@gltf-transform/core": "4.2.1",
+    "@gltf-transform/extensions": "4.2.1",
+    "@gltf-transform/functions": "4.2.1",
+    "meshoptimizer": "0.22.0"
   }
 }
